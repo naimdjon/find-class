@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -24,7 +27,6 @@ public class ClassFinder {
     public Collection<String> find(final String pattern) throws IOException {
         this.pattern = pattern;
         result.clear();
-        System.out.println("Classfinder Files.list(dir.toPath())" + Arrays.toString(Files.list(dir.toPath()).toArray()));
         Files.list(dir.toPath())
                 .filter(p -> p.getFileName()
                         .toString().endsWith(".jar"))

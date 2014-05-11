@@ -3,6 +3,7 @@ package org.findclass;
 import java.io.File;
 import java.util.Collection;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 public class FindClassTest {
@@ -14,5 +15,6 @@ public class FindClassTest {
     public void testFindClassInJar() throws Exception {
         Collection<String> files = ClassFinder.searchIn(new File(testdir)).find("test");
         assertNotNull(files);
+        assertEquals(testdir+"/test.jar", files.iterator().next());
     }
 }
