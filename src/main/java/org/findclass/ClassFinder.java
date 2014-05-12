@@ -15,6 +15,7 @@ import java.util.jar.JarFile;
 public class ClassFinder {
     final private File dir;
     private String pattern;
+    final Set<String> result = new LinkedHashSet<>();
 
     private ClassFinder(File dir) {
         this.dir = dir;
@@ -28,30 +29,32 @@ public class ClassFinder {
         this.pattern = pattern;
         result.clear();
         Files.list(dir.toPath())
-                .filter(p -> p.getFileName()
-                        .toString().endsWith(".jar"))
+                .filter(p -> p.getFileName().toString().endsWith(".jar"))
                 .forEach(this::process);
-
         return result;
     }
-    final Set<String> result=new LinkedHashSet<>();
+
     private void process(final Path p) {
-        try {
-            File j = p.toFile();
-            JarFile jar = new JarFile(j);
-            final Enumeration<JarEntry> e = jar.entries();
-            while (e.hasMoreElements()) {
-                JarEntry entry = e.nextElement();
-                if (entry.getName().toLowerCase().contains(pattern)
-                        || entry.getName().toLowerCase().contains(pattern.replace(".", "/"))
-                        ) {
-                    result.add(jar.getName());
-                }
-            }
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        final JarFile jar = toJarFile(p);
+        final Enumeration<JarEntry> e = jar.entries();
+        while (e.hasMoreElements()) {
+            if (matchesPattern(e.nextElement()))
+                result.add(jar.getName());
         }
+    }
 
+    private JarFile toJarFile(final Path p) {
+        try {
+            return new JarFile(p.toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
+    private boolean matchesPattern(final JarEntry entry) {
+        final String entryName = entry.getName().toLowerCase();
+        return entryName.contains(pattern)
+                || entryName.contains(pattern.replace(".", "/"));
     }
 }
