@@ -28,13 +28,25 @@ public class ClassFinder {
     public Collection<String> find(final String pattern) throws IOException {
         this.pattern = pattern;
         result.clear();
-        Files.list(dir.toPath())
-                .filter(p -> p.getFileName().toString().endsWith(".jar"))
-                .forEach(this::process);
+        process(dir.toPath());
         return result;
     }
 
-    private void process(final Path p) {
+    private void process(final Path path) {
+        try {
+            Files.list(path)
+                    .filter(p -> p.getFileName().toString().endsWith(".jar"))
+                    .forEach(this::addJarNameIfContainsClass);
+
+            Files.list(path)
+                    .filter(p -> p.toFile().canRead() && p.toFile().isDirectory())
+                    .forEach(this::process);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    private void addJarNameIfContainsClass(Path p) {
         final JarFile jar = toJarFile(p);
         final Enumeration<JarEntry> e = jar.entries();
         while (e.hasMoreElements()) {
