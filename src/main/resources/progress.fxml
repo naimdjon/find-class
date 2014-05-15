@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import java.net.URL?>
+<BorderPane styleClass="progress-dialog"
+      maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefWidth="430.0"
+      prefHeight="150.0"
+      xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/" fx:controller="org.findclass.SearchProgress">
+    <top>
+        <Pane>
+            <children>
+                <Label text="Searching for the class..."/>
+            </children>
+        </Pane>
+    </top>
+    <center>
+        <HBox>
+            <children>
+                <ProgressBar prefWidth="250"/>
+                <Button mnemonicParsing="false" text="Cancel" fx:id="okButton" cancelButton="true"
+                        onAction="#cancel"/>
+            </children>
+        </HBox>
+    </center>
+    <stylesheets>
+        <URL value="@progress.css"/>
+        <URL value="@main.css"/>
+    </stylesheets>
+</BorderPane>
