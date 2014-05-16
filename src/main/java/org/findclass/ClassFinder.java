@@ -42,13 +42,14 @@ public class ClassFinder {
         this.searchString = searchString;
         result.clear();
         process(dir.toPath());
-
-
         return result;
     }
 
-    private void process(final Path path) {
+    private void process(final Path path) throws IllegalArgumentException{
         try {
+            if (!Files.exists(path)) {
+                throw new IllegalArgumentException(String.format("'%s' does not exist!",path.toString()));
+            }
             Files.list(path)
                     .filter(p -> p.getFileName().toString().endsWith(".jar"))
                     .forEach(this::addJarNameIfContainsClass);

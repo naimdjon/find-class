@@ -17,9 +17,6 @@ import java.io.IOException;
 import static org.findclass.ClassFinder.loadResource;
 
 public class SearchProgress {
-
-    //private Stage ownerStage;
-
     private Stage myStage;
     private EventHandler<Event> cancelListener;
 
