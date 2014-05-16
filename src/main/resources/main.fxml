@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--percentWidth-->
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import java.net.URL?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.findclass.ClassFinderController">
+    <top>
+        <Pane prefHeight="195.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <children>
+                <Group>
+                    <children>
+                        <Label layoutX="58.0" layoutY="25.0" prefHeight="15.0" prefWidth="80.0" text="Search in " />
+                        <TextField fx:id="searchLocation" layoutX="138.0" layoutY="20.0" prefHeight="26.0" prefWidth="350.0" />
+                    </children>
+                </Group>
+                <Button fx:id="browseButton" layoutX="505.0" layoutY="20.0" mnemonicParsing="false" onAction="#chooseSearchLocation" text="Browse" />
+                <Group>
+                    <children>
+                        <Label layoutX="44.0" layoutY="65.0" text="Class name" />
+                        <TextField fx:id="searchString" layoutX="138.0" layoutY="60.0" prefHeight="26.0" prefWidth="350.0" />
+                    </children>
+                </Group>
+                <CheckBox fx:id="isRegex" layoutX="138.0" layoutY="98.0" mnemonicParsing="false" text="Regex" />
+                <CheckBox fx:id="isRecursive" layoutX="240.0" layoutY="98.0" mnemonicParsing="false" selected="true" text="Recursive" />
+
+                <Separator layoutX="138.0" layoutY="130.0" prefHeight="2.0" prefWidth="350.0" />
+
+                <Button fx:id="searchButton" layoutX="421.0" layoutY="149.0" mnemonicParsing="false" onAction="#search" text="Search">
+                </Button>
+            </children>
+        </Pane>
+    </top>
+    <center>
+        <ScrollPane fx:id="scrollPane" prefHeight="200.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+    </center>
+    <bottom>
+        <ToolBar layoutX="-86.0" layoutY="150.0" prefWidth="200.0">
+            <items>
+
+            </items>
+        </ToolBar>
+    </bottom>
+    <stylesheets>
+        <URL value="@main.css" />
+    </stylesheets>
+</BorderPane>
