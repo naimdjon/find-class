@@ -1,6 +1,7 @@
 package org.findclass;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -20,18 +21,20 @@ public class SearchProgress {
     //private Stage ownerStage;
 
     private Stage myStage;
-    private EventHandler cancelListener;
+    private EventHandler<Event> cancelListener;
 
-    public static void showProgress(final Stage ownerStage,final EventHandler cancelListener) {
+    public static SearchProgress showProgress(final Stage ownerStage,final EventHandler<Event> cancelListener) {
         try {
             final FXMLLoader fxmlLoader = new FXMLLoader(loadResource("./progress.fxml"));
             final Pane contentPane = fxmlLoader.load();
-            final SearchProgress controller = fxmlLoader.getController();
-            controller.init(ownerStage, contentPane);
-            controller.cancelListener=cancelListener;
+            final SearchProgress searchProgress = fxmlLoader.getController();
+            searchProgress.init(ownerStage, contentPane);
+            searchProgress.cancelListener=cancelListener;
+            return searchProgress;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private void init(final Stage ownerStage, final Pane contentPane) {
@@ -43,7 +46,7 @@ public class SearchProgress {
         myStage.show();
     }
 
-    public void cancel(ActionEvent actionEvent) {
+    public void close(ActionEvent actionEvent) {
         myStage.close();
         cancelListener.handle(actionEvent);
     }

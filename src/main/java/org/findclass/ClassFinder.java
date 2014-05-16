@@ -3,6 +3,7 @@ package org.findclass;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -14,21 +15,35 @@ import java.util.jar.JarFile;
 
 public class ClassFinder {
     final private File dir;
-    private String pattern;
+    private String searchString;
+    private boolean isRegex = false;
+    private boolean isRecursive = true;
     final Set<String> result = new LinkedHashSet<>();
 
     private ClassFinder(File dir) {
         this.dir = dir;
     }
 
+    static ClassFinder searchIn(final String dir) {
+        return searchIn(new File(dir));
+    }
+
     static ClassFinder searchIn(final File dir) {
         return new ClassFinder(dir);
     }
 
-    public Collection<String> find(final String pattern) throws IOException {
-        this.pattern = pattern;
+
+    public Collection<String> findRegex(final String searchString) throws IOException {
+        isRegex = true;
+        return find(searchString);
+    }
+
+    public Collection<String> find(final String searchString) throws IOException {
+        this.searchString = searchString;
         result.clear();
         process(dir.toPath());
+
+
         return result;
     }
 
@@ -38,9 +53,11 @@ public class ClassFinder {
                     .filter(p -> p.getFileName().toString().endsWith(".jar"))
                     .forEach(this::addJarNameIfContainsClass);
 
-            Files.list(path)
-                    .filter(p -> p.toFile().canRead() && p.toFile().isDirectory())
-                    .forEach(this::process);
+            if (isRecursive) {
+                Files.list(path)
+                        .filter(p -> p.toFile().canRead() && p.toFile().isDirectory())
+                        .forEach(this::process);
+            }
         } catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -50,7 +67,7 @@ public class ClassFinder {
         final JarFile jar = toJarFile(p);
         final Enumeration<JarEntry> e = jar.entries();
         while (e.hasMoreElements()) {
-            if (matchesPattern(e.nextElement()))
+            if (matchesSearchString(e.nextElement()))
                 result.add(jar.getName());
         }
     }
@@ -64,9 +81,17 @@ public class ClassFinder {
         }
     }
 
-    private boolean matchesPattern(final JarEntry entry) {
+    private boolean matchesSearchString(final JarEntry entry) {
         final String entryName = entry.getName().toLowerCase();
-        return entryName.contains(pattern)
-                || entryName.contains(pattern.replace(".", "/"));
+        return entryName.contains(searchString)
+                || entryName.contains(searchString.replace(".", "/"))
+                || isRegex && entryName.matches(searchString)
+                ;
     }
+
+
+    public static URL loadResource(final String name) {
+        return ClassFinder.class.getClassLoader().getResource(name);
+    }
+
 }

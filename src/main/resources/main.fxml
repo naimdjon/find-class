@@ -35,14 +35,16 @@
         </Pane>
     </top>
     <center>
-        <ScrollPane fx:id="scrollPane" prefHeight="200.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+        <ScrollPane fx:id="scrollPane" prefHeight="100.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <ListView minWidth="595" fx:id="searchResults"/>
+        </ScrollPane>
     </center>
     <bottom>
-        <ToolBar layoutX="-86.0" layoutY="150.0" prefWidth="200.0">
+        <!--<ToolBar layoutX="-86.0" layoutY="150.0" prefWidth="200.0">
             <items>
 
             </items>
-        </ToolBar>
+        </ToolBar>-->
     </bottom>
     <stylesheets>
         <URL value="@main.css" />

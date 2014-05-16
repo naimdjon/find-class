@@ -25,7 +25,7 @@
             <children>
                 <ProgressBar prefWidth="250"/>
                 <Button mnemonicParsing="false" text="Cancel" fx:id="okButton" cancelButton="true"
-                        onAction="#cancel"/>
+                        onAction="#close"/>
             </children>
         </HBox>
     </center>
