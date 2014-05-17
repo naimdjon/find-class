@@ -115,6 +115,7 @@ public class ClassFinderController {
     }
 
     public static void showError(final String message, final Stage ownerStage) {
+        System.out.println("test");
         MessageDialog.error(message, ownerStage);
     }
 

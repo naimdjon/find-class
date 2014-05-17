@@ -55,9 +55,12 @@ public class ClassFinder {
                     .forEach(this::addJarNameIfContainsClass);
 
             if (isRecursive) {
-                Files.list(path)
-                        .filter(p -> p.toFile().canRead() && p.toFile().isDirectory())
-                        .forEach(this::process);
+               String[] files=path.toFile().list((dir1, name) -> {
+                   File f = new File(name);
+                   return f.canRead() && f.isDirectory();
+               });
+                for (final String file : files)
+                    process(new File(file).toPath());
             }
         } catch (IOException e1) {
             e1.printStackTrace();
