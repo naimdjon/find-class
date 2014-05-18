@@ -44,7 +44,11 @@ public class SearchProgress {
     }
 
     public void close(ActionEvent actionEvent) {
-        myStage.close();
-        cancelListener.handle(null);
+        try {
+            myStage.close();
+            cancelListener.handle(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

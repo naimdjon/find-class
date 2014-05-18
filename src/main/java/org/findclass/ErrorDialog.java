@@ -14,10 +14,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class MessageDialog {
+public class ErrorDialog {
     private final String message;
 
-    public MessageDialog(final String message) {
+    public ErrorDialog(final String message) {
         this.message = message;
     }
 
@@ -57,11 +57,12 @@ public class MessageDialog {
         };
     }
 
-    public static void error(final String s, final Stage stage) {
-        new MessageDialog(s).show(stage);
+    public static void showError(final String s, final Stage stage) {
+        new ErrorDialog(s).show(stage);
     }
 
     class Coordinates {
         double x, y;
     }
+
 }

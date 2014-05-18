@@ -55,19 +55,16 @@ public class ClassFinder {
                     .forEach(this::addJarNameIfContainsClass);
 
             if (isRecursive) {
-               String[] files=path.toFile().list((dir1, name) -> {
-                   File f = new File(name);
-                   return f.canRead() && f.isDirectory();
-               });
-                for (final String file : files)
-                    process(new File(file).toPath());
+               File[] files=path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
+                for (final File file : files)
+                    process(file.toPath());
             }
         } catch (IOException e1) {
             e1.printStackTrace();
         }
     }
 
-    private void addJarNameIfContainsClass(Path p) {
+    private void addJarNameIfContainsClass(final Path p) {
         final JarFile jar = toJarFile(p);
         final Enumeration<JarEntry> e = jar.entries();
         while (e.hasMoreElements()) {

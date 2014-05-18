@@ -1,5 +1,6 @@
 package org.findclass;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,7 +17,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -71,40 +71,42 @@ public class ClassFinderController {
             searchLocation.setText(file.getAbsolutePath());
     }
 
-    public void search(ActionEvent actionEvent) {
+    public void search(final ActionEvent actionEvent) {
         if (searchString.getText().isEmpty()) {
-            showError("Empty search string!", stage);
+            ErrorDialog.showError("Empty search string!", stage);
             return;
         }
         if (searchLocation.getText().isEmpty()) {
-            showError("Where to search?", stage);
+            ErrorDialog.showError("Where to search?", stage);
             return;
         }
         searchButton.setDisable(true);
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final SearchProgress searchProgress = showProgress(stage, getCancelListener());
         executor.submit(() -> {
-            showResults(searchProgress);
+            showResults(searchProgress,actionEvent);
             executor.shutdown();
         });
         updateLastShutdownHook();
     }
 
-    private void showResults(final SearchProgress searchProgress) {
+    private void showResults(final SearchProgress searchProgress, ActionEvent actionEvent) {
         try {
             final Collection<String> matches = searchIn(searchLocation.getText()).find(searchString.getText());
-            ObservableList<String> items = FXCollections.observableArrayList(matches);
-            searchResults.setItems(items);
-        } catch (IllegalArgumentException e) {
+            Platform.runLater(() -> {
+                ObservableList<String> items = FXCollections.observableArrayList(matches);
+                System.out.println("found:"+items.size());
+                searchResults.setItems(items);
+            });
+        } catch (Exception e) {
             e.printStackTrace();
-            searchProgress.close(null);
-            showError(e.getMessage(), stage);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Searching failed!", stage);
-        } finally {
-            searchProgress.close(null);
+            Platform.runLater(() -> {
+                searchProgress.close(actionEvent);
+                ErrorDialog.showError(e.getMessage(), stage);
+            });
+            return;
         }
+        Platform.runLater(() -> searchProgress.close(null));
     }
 
     private EventHandler<Event> getCancelListener() {
@@ -112,11 +114,6 @@ public class ClassFinderController {
             stage.getScene().getRoot().setEffect(null);
             searchButton.setDisable(false);
         };
-    }
-
-    public static void showError(final String message, final Stage ownerStage) {
-        System.out.println("test");
-        MessageDialog.error(message, ownerStage);
     }
 
     public Properties getLastUsedProperties() {
