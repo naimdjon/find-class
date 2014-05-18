@@ -44,8 +44,7 @@ public class SearchProgress {
     }
 
     public void close(ActionEvent actionEvent) {
-        System.out.println("closing...");
         myStage.close();
-        cancelListener.handle(actionEvent);
+        cancelListener.handle(null);
     }
 }
