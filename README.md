@@ -18,6 +18,8 @@ And run the application using the following methods:
 
 Screenshot:
 
+![Screenshot of find-class](http://picpaste.com/pics/lHXkFEQN.1400528958.png)
+
 ---
 
 License
