@@ -28,7 +28,7 @@
                 <CheckBox fx:id="isRecursive" layoutX="240.0" layoutY="98.0" mnemonicParsing="false" selected="true" text="Recursive" />
 
                 <Separator layoutX="138.0" layoutY="130.0" prefHeight="2.0" prefWidth="350.0" />
-
+                <Label layoutX="138.0" layoutY="149.0" text=" " fx:id="totalHits" />
                 <Button fx:id="searchButton" layoutX="421.0" layoutY="149.0" mnemonicParsing="false" onAction="#search" text="Search">
                 </Button>
             </children>
