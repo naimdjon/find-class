@@ -7,6 +7,8 @@ public class Constants {
 
     public enum Properties {
         Last_used_dir,
-        Last_used_searchString
+        Last_used_searchString,
+        Last_used_isRegex,
+        Last_used_isRecursive
     }
 }

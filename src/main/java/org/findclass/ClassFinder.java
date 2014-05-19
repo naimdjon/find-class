@@ -39,26 +39,30 @@ public class ClassFinder {
     }
 
     private void process(final Path path) throws IllegalArgumentException {
-        try {
-            if (!Files.exists(path)) {
-                throw new IllegalArgumentException(String.format("'%s' does not exist!", path.toString()));
-            }
-            Files.list(path)
+        if (!Files.exists(path)) {
+            throw new IllegalArgumentException(String.format("'%s' does not exist!", path.toString()));
+        }
+        final File[] jarsInCurrentDir = path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isFile() && pathname.getName().endsWith(".jar"));
+        if (jarsInCurrentDir != null) {
+            for (final File candidateJarFile : jarsInCurrentDir)
+                addJarNameContainingClass(candidateJarFile);
+        }
+            /*Files.list(path) //too many open files
                     .filter(p -> p.getFileName().toString().endsWith(".jar"))
-                    .forEach(this::addJarNameIfContainsClass);
+                    .forEach(this::addJarNameContainingClass);*/
 
-            if (isRecursive) {
-                File[] files = path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
+        if (isRecursive) {
+            File[] files = path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
+            if (files != null) {
                 for (final File file : files)
                     process(file.toPath());
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
         }
     }
 
-    private void addJarNameIfContainsClass(final Path p) {
+    private void addJarNameContainingClass(final File p) {
         final JarFile jar = toJarFile(p);
+        if(jar==null)return;
         final Enumeration<JarEntry> e = jar.entries();
         while (e.hasMoreElements()) {
             if (matchesSearchString(e.nextElement()))
@@ -66,9 +70,9 @@ public class ClassFinder {
         }
     }
 
-    private JarFile toJarFile(final Path p) {
+    private JarFile toJarFile(final File f) {
         try {
-            return new JarFile(p.toFile());
+            return new JarFile(f);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -89,12 +93,12 @@ public class ClassFinder {
     }
 
     public ClassFinder recursive(final boolean isRecursive) {
-        this.isRecursive=isRecursive;
+        this.isRecursive = isRecursive;
         return this;
     }
 
     public ClassFinder regex(final boolean isRegex) {
-        this.isRegex=isRegex;
+        this.isRegex = isRegex;
         return this;
     }
 }

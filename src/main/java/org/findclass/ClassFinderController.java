@@ -19,8 +19,7 @@ import java.util.Properties;
 
 import static org.findclass.ClassFinder.searchIn;
 import static org.findclass.Constants.LAST_USED_FILE;
-import static org.findclass.Constants.Properties.Last_used_dir;
-import static org.findclass.Constants.Properties.Last_used_searchString;
+import static org.findclass.Constants.Properties.*;
 import static org.findclass.SearchProgress.showProgress;
 
 public class ClassFinderController {
@@ -52,11 +51,17 @@ public class ClassFinderController {
         final Properties properties = getLastUsedProperties();
         System.out.println("properties:" + properties);
         Object lastUsedLocation = properties.get(Last_used_dir.name());
+        Object lastUsedRegex = properties.get(Last_used_isRegex.name());
+        Object lastUsedRecursive = properties.get(Last_used_isRecursive.name());
         if (lastUsedLocation == null) lastUsedLocation = System.getProperty("user.dir");
         searchLocation.setText(lastUsedLocation.toString());
         final Object lastUsedSearchString = properties.get(Last_used_searchString.name());
         if (lastUsedSearchString != null)
             searchString.setText(lastUsedSearchString.toString());
+        if(lastUsedRegex!=null)
+            isRegex.setSelected(Boolean.valueOf(lastUsedRegex.toString().trim()));
+        if(lastUsedRecursive!=null)
+            isRecursive.setSelected(Boolean.valueOf(lastUsedRecursive.toString().trim()));
     }
 
     public void chooseSearchLocation(final ActionEvent actionEvent) {
@@ -150,6 +155,8 @@ public class ClassFinderController {
                 try (FileOutputStream outputStream = new FileOutputStream(LAST_USED_FILE)) {
                     p.put(Last_used_dir.name(), searchLocation.getText());
                     p.put(Last_used_searchString.name(), searchString.getText());
+                    p.put(Last_used_isRegex.name(), ""+isRegex.isSelected());
+                    p.put(Last_used_isRecursive.name(), ""+isRecursive.isSelected());
                     p.store(outputStream, "Last used properties");
                 }
             } catch (Throwable e) {
