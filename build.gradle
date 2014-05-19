@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+mainClassName = System.getProperty("mainClassName") ?: "org.findclass.MainFX"
+
+project.buildDir = 'target'
+version = '1.0-SNAPSHOT'
+
+jar {
+    destinationDir = project.buildDir
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+idea {
+    project {
+        module {
+            jdkName = '1.8'
+            ext.languageLevel = '1.8'
+            downloadSources = true
+            downloadJavadoc = true
+        }
+    }
+}
