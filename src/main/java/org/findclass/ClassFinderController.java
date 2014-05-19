@@ -7,10 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -44,6 +41,9 @@ public class ClassFinderController {
 
     @FXML
     private ListView<String> searchResults;
+
+    @FXML
+    private Label totalHits;
 
     private Stage stage;
 
@@ -94,7 +94,11 @@ public class ClassFinderController {
                     .find(searchString.getText());
             Platform.runLater(() -> {
                 ObservableList<String> items = FXCollections.observableArrayList(matches);
-                System.out.println("found:" + items.size());
+                String text="Hits: "+matches.size();
+                if (matches.size() == 0) {
+                    text="Nothing was found!";
+                }
+                totalHits.setText(text);
                 searchResults.setItems(items);
             });
         } catch (Exception e) {
