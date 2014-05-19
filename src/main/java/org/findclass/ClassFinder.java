@@ -1,6 +1,5 @@
 package org.findclass;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -14,11 +13,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class ClassFinder {
-    final private File dir;
+    private final File dir;
     private String searchString;
     private boolean isRegex = false;
     private boolean isRecursive = true;
-    final Set<String> result = new LinkedHashSet<>();
+    private final Set<String> result = new LinkedHashSet<>();
 
     private ClassFinder(File dir) {
         this.dir = dir;
@@ -32,12 +31,6 @@ public class ClassFinder {
         return new ClassFinder(dir);
     }
 
-
-    public Collection<String> findRegex(final String searchString) throws IOException {
-        isRegex = true;
-        return find(searchString);
-    }
-
     public Collection<String> find(final String searchString) throws IOException {
         this.searchString = searchString;
         result.clear();
@@ -45,17 +38,17 @@ public class ClassFinder {
         return result;
     }
 
-    private void process(final Path path) throws IllegalArgumentException{
+    private void process(final Path path) throws IllegalArgumentException {
         try {
             if (!Files.exists(path)) {
-                throw new IllegalArgumentException(String.format("'%s' does not exist!",path.toString()));
+                throw new IllegalArgumentException(String.format("'%s' does not exist!", path.toString()));
             }
             Files.list(path)
                     .filter(p -> p.getFileName().toString().endsWith(".jar"))
                     .forEach(this::addJarNameIfContainsClass);
 
             if (isRecursive) {
-               File[] files=path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
+                File[] files = path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
                 for (final File file : files)
                     process(file.toPath());
             }
@@ -86,7 +79,7 @@ public class ClassFinder {
         final String entryName = entry.getName().toLowerCase();
         return entryName.contains(searchString)
                 || entryName.contains(searchString.replace(".", "/"))
-                || isRegex && entryName.matches(searchString)
+                || (isRegex && entryName.matches(searchString))
                 ;
     }
 
@@ -95,4 +88,13 @@ public class ClassFinder {
         return ClassFinder.class.getClassLoader().getResource(name);
     }
 
+    public ClassFinder recursive(final boolean isRecursive) {
+        this.isRecursive=isRecursive;
+        return this;
+    }
+
+    public ClassFinder regex(final boolean isRegex) {
+        this.isRegex=isRegex;
+        return this;
+    }
 }

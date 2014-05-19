@@ -19,8 +19,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.findclass.ClassFinder.searchIn;
 import static org.findclass.Constants.LAST_USED_FILE;
@@ -52,7 +50,7 @@ public class ClassFinderController {
     public void init(Stage stage) {
         this.stage = stage;
         final Properties properties = getLastUsedProperties();
-        System.out.println("properties:"+properties);
+        System.out.println("properties:" + properties);
         Object lastUsedLocation = properties.get(Last_used_dir.name());
         if (lastUsedLocation == null) lastUsedLocation = System.getProperty("user.dir");
         searchLocation.setText(lastUsedLocation.toString());
@@ -81,21 +79,22 @@ public class ClassFinderController {
             return;
         }
         searchButton.setDisable(true);
-        final ExecutorService executor = Executors.newSingleThreadExecutor();
         final SearchProgress searchProgress = showProgress(stage, getCancelListener());
-        executor.submit(() -> {
-            showResults(searchProgress,actionEvent);
-            executor.shutdown();
-        });
+        final Thread t = new Thread(() -> showResults(searchProgress, actionEvent));
+        t.setDaemon(true);
+        t.start();
         updateLastShutdownHook();
     }
 
     private void showResults(final SearchProgress searchProgress, ActionEvent actionEvent) {
         try {
-            final Collection<String> matches = searchIn(searchLocation.getText()).find(searchString.getText());
+            final Collection<String> matches = searchIn(searchLocation.getText())
+                    .recursive(isRecursive.isSelected())
+                    .regex(isRegex.isSelected())
+                    .find(searchString.getText());
             Platform.runLater(() -> {
                 ObservableList<String> items = FXCollections.observableArrayList(matches);
-                System.out.println("found:"+items.size());
+                System.out.println("found:" + items.size());
                 searchResults.setItems(items);
             });
         } catch (Exception e) {

@@ -20,13 +20,13 @@ public class SearchProgress {
     private Stage myStage;
     private EventHandler<Event> cancelListener;
 
-    public static SearchProgress showProgress(final Stage ownerStage,final EventHandler<Event> cancelListener) {
+    public static SearchProgress showProgress(final Stage ownerStage, final EventHandler<Event> cancelListener) {
         try {
             final FXMLLoader fxmlLoader = new FXMLLoader(loadResource("./progress.fxml"));
             final Pane contentPane = fxmlLoader.load();
             final SearchProgress searchProgress = fxmlLoader.getController();
             searchProgress.init(ownerStage, contentPane);
-            searchProgress.cancelListener=cancelListener;
+            searchProgress.cancelListener = cancelListener;
             return searchProgress;
         } catch (IOException e) {
             e.printStackTrace();
