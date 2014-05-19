@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -32,41 +31,53 @@ public class ClassFinder {
     }
 
     public Collection<String> find(final String searchString) throws IOException {
-        this.searchString = searchString;
-        result.clear();
-        process(dir.toPath());
+        setNewSearch(searchString);
+        process(dir, null);
         return result;
     }
 
-    private void process(final Path path) throws IllegalArgumentException {
-        if (!Files.exists(path)) {
+    private void setNewSearch(final String searchString) {
+        this.searchString = searchString;
+        result.clear();
+    }
+
+    private void process(final File path, final MatchListener matchListener) throws IllegalArgumentException {
+        if (!path.exists()) {
             throw new IllegalArgumentException(String.format("'%s' does not exist!", path.toString()));
         }
-        final File[] jarsInCurrentDir = path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isFile() && pathname.getName().endsWith(".jar"));
+        final File[] jarsInCurrentDir = path.listFiles(pathname -> pathname.canRead() && pathname.isFile() && pathname.getName().endsWith(".jar"));
         if (jarsInCurrentDir != null) {
             for (final File candidateJarFile : jarsInCurrentDir)
-                addJarNameContainingClass(candidateJarFile);
+                addJarNameContainingClass(candidateJarFile, matchListener);
         }
             /*Files.list(path) //too many open files
                     .filter(p -> p.getFileName().toString().endsWith(".jar"))
                     .forEach(this::addJarNameContainingClass);*/
 
         if (isRecursive) {
-            File[] files = path.toFile().listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
+            if (Files.isSymbolicLink(path.toPath())) {
+                return;
+            }
+            File[] files = path.listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
             if (files != null) {
                 for (final File file : files)
-                    process(file.toPath());
+                    process(file, matchListener);
             }
         }
     }
 
-    private void addJarNameContainingClass(final File p) {
+    private void addJarNameContainingClass(final File p, final MatchListener matchListener) {
         final JarFile jar = toJarFile(p);
-        if(jar==null)return;
+        if (jar == null) return;
         final Enumeration<JarEntry> e = jar.entries();
         while (e.hasMoreElements()) {
-            if (matchesSearchString(e.nextElement()))
+            if (matchesSearchString(e.nextElement())) {
                 result.add(jar.getName());
+                if (matchListener != null) {
+                    matchListener.onMatch(jar);
+                }
+                break;
+            }
         }
     }
 
@@ -100,5 +111,10 @@ public class ClassFinder {
     public ClassFinder regex(final boolean isRegex) {
         this.isRegex = isRegex;
         return this;
+    }
+
+    public void collectMatches(final String searchString, final MatchListener matchListener) {
+        setNewSearch(searchString);
+        process(dir, matchListener);
     }
 }

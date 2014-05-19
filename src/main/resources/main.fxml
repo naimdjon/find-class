@@ -35,7 +35,7 @@
         </Pane>
     </top>
     <center>
-        <ScrollPane fx:id="scrollPane" prefHeight="100.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+        <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefHeight="50.0" prefWidth="600.0" BorderPane.alignment="CENTER">
             <ListView minWidth="595" fx:id="searchResults"/>
         </ScrollPane>
     </center>
