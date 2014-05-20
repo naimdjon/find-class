@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import static org.findclass.ClassFinder.searchIn;
@@ -143,7 +145,7 @@ public class ClassFinderController {
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select directory to search");
         String initialLocation = searchLocation.getText();
-        if (initialLocation == null || initialLocation.length() < 1)
+        if (initialLocation == null || initialLocation.length() < 1 || !Files.exists(Paths.get(initialLocation)))
             initialLocation = System.getProperty("user.home");
         directoryChooser.setInitialDirectory(new File(initialLocation));
         final File file = directoryChooser.showDialog(stage);
