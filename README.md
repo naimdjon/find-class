@@ -2,7 +2,7 @@ find-class
 ==========
 
 **find-class** is an open-source, [JavaFX](http://www.oracle.com/technetwork/java/javase/overview/javafx-overview-2158620.html) application. 
-**find-class** enables search for a class in jar files on a selected directory. It runs on Java 8 which automatically includes JavaFX.
+**find-class** enables a search for a class in jar files on a selected directory. It runs on Java 8 which automatically includes JavaFX.
 **find-class** is cross-platform and has been tested under Windows, Linux and Mac OS X.
 
 How to run it? Check out with with git: `git clone https://github.com/naimdjon/find-class` 
