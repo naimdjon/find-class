@@ -103,6 +103,10 @@ public class ClassFinder {
         return ClassFinder.class.getClassLoader().getResource(name);
     }
 
+    public ClassFinder recursive() {
+        return recursive(true);
+    }
+
     public ClassFinder recursive(final boolean isRecursive) {
         this.isRecursive = isRecursive;
         return this;
