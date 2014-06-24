@@ -20,7 +20,7 @@ And run the application using the following methods:
 
 Screenshot:
 
-![Screenshot of find-class](http://imagebin.org/index.php?mode=image&id=311405)
+![Screenshot of find-class](http://takhirov.name/find-class.png)
 
 ---
 
