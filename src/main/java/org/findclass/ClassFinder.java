@@ -37,7 +37,7 @@ public class ClassFinder {
     }
 
     private void setNewSearch(final String searchString) {
-        this.searchString = searchString;
+        this.searchString = searchString.toLowerCase();
         result.clear();
     }
 
@@ -47,22 +47,24 @@ public class ClassFinder {
         }
         final File[] jarsInCurrentDir = path.listFiles(pathname -> pathname.canRead() && pathname.isFile() && pathname.getName().endsWith(".jar"));
         if (jarsInCurrentDir != null) {
-            for (final File candidateJarFile : jarsInCurrentDir)
+            for (final File candidateJarFile : jarsInCurrentDir) {
                 addJarNameContainingClass(candidateJarFile, matchListener);
-        }
-            /*Files.list(path) //too many open files
-                    .filter(p -> p.getFileName().toString().endsWith(".jar"))
-                    .forEach(this::addJarNameContainingClass);*/
+            }
 
+        }
         if (isRecursive) {
-            if (Files.isSymbolicLink(path.toPath())) {
-                return;
-            }
-            File[] files = path.listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
-            if (files != null) {
-                for (final File file : files)
-                    process(file, matchListener);
-            }
+            processRecursive(path, matchListener);
+        }
+    }
+
+    private void processRecursive(File path, MatchListener matchListener) {
+        if (Files.isSymbolicLink(path.toPath())) {
+            return;
+        }
+        File[] files = path.listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
+        if (files != null) {
+            for (final File file : files)
+                process(file, matchListener);
         }
     }
 
