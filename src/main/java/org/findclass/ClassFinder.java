@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class ClassFinder {
+class ClassFinder {
     private final File dir;
     private String searchString;
     private boolean isRegex = false;
@@ -30,8 +30,8 @@ public class ClassFinder {
         return new ClassFinder(dir);
     }
 
-    public Collection<String> find(final String searchString) throws IOException {
-        setNewSearch(searchString);
+    Collection<String> find() throws IOException {
+        setNewSearch("test");
         process(dir, null);
         return result;
     }
@@ -57,19 +57,19 @@ public class ClassFinder {
         }
     }
 
-    private void processRecursive(File path, MatchListener matchListener) {
+    private void processRecursive(File path, MatchListener matchListener) throws IllegalArgumentException {
         if (Files.isSymbolicLink(path.toPath())) {
             return;
         }
-        File[] files = path.listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
+        final File[] files = path.listFiles(pathname -> pathname.canRead() && pathname.isDirectory());
         if (files != null) {
             for (final File file : files)
                 process(file, matchListener);
         }
     }
 
-    private void addJarNameContainingClass(final File p, final MatchListener matchListener) {
-        final JarFile jar = toJarFile(p);
+    private void addJarNameContainingClass(final File file, final MatchListener matchListener) {
+        final JarFile jar = toJarFile(file);
         if (jar == null) return;
         final Enumeration<JarEntry> e = jar.entries();
         while (e.hasMoreElements()) {
@@ -101,25 +101,26 @@ public class ClassFinder {
     }
 
 
-    public static URL loadResource(final String name) {
+    static URL loadResource(final String name) {
         return ClassFinder.class.getClassLoader().getResource(name);
     }
 
-    public ClassFinder recursive() {
+    ClassFinder recursive() {
         return recursive(true);
     }
 
-    public ClassFinder recursive(final boolean isRecursive) {
+
+    ClassFinder recursive(final boolean isRecursive) {
         this.isRecursive = isRecursive;
         return this;
     }
 
-    public ClassFinder regex(final boolean isRegex) {
+    ClassFinder regex(final boolean isRegex) {
         this.isRegex = isRegex;
         return this;
     }
 
-    public void collectMatches(final String searchString, final MatchListener matchListener) {
+    void collectMatches(final String searchString, final MatchListener matchListener) {
         setNewSearch(searchString);
         process(dir, matchListener);
     }

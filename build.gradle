@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'application'
 
-mainClassName = System.getProperty("mainClassName") ?: "org.findclass.MainFX"
+mainClassName = System.getProperty("mainClassName") ?: "org.findclass.Main"
 
 project.buildDir = 'target'
 version = '1.0-SNAPSHOT'

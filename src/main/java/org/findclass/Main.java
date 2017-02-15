@@ -12,7 +12,7 @@ import java.io.IOException;
 
 import static org.findclass.ClassFinder.loadResource;
 
-public class MainFX extends Application {
+public class Main extends Application {
 
     private final Group root = new Group();
 

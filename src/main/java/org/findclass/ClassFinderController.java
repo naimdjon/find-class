@@ -5,7 +5,11 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -16,10 +20,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import static org.findclass.Alerts.showError;
 import static org.findclass.ClassFinder.searchIn;
 import static org.findclass.Constants.LAST_USED_FILE;
-import static org.findclass.Constants.Properties.*;
-import static org.findclass.ErrorDialog.showError;
+import static org.findclass.Constants.Properties.Last_used_dir;
+import static org.findclass.Constants.Properties.Last_used_isRecursive;
+import static org.findclass.Constants.Properties.Last_used_isRegex;
+import static org.findclass.Constants.Properties.Last_used_searchString;
 import static org.findclass.SearchProgress.showProgress;
 
 public class ClassFinderController {
@@ -46,7 +53,7 @@ public class ClassFinderController {
 
     private Stage stage;
 
-    public void init(Stage stage) {
+    void init(Stage stage) {
         this.stage = stage;
         final Properties properties = getLastUsedProperties();
         Object lastUsedLocation = properties.get(Last_used_dir.name());
@@ -65,11 +72,15 @@ public class ClassFinderController {
 
     public void search(final ActionEvent actionEvent) {
         if (searchString.getText().isEmpty()) {
-            showError("Empty search string!", stage);
+            showError("Empty search string!");
             return;
         }
         if (searchLocation.getText().isEmpty()) {
-            showError("Where to search?", stage);
+            showError("Where to search?");
+            return;
+        }
+        if (Files.isSymbolicLink(Paths.get(searchLocation.getText())) && isRecursive.isSelected()) {
+            showError("Given location is a symbolic link; recursive search is not supported in such cases.");
             return;
         }
         searchButton.setDisable(true);
@@ -86,25 +97,11 @@ public class ClassFinderController {
                     .recursive(isRecursive.isSelected())
                     .regex(isRegex.isSelected())
                     .collectMatches(searchString.getText(), getMatchListener());
-
-            /*final Collection<String> matches = searchIn(searchLocation.getText())
-                    .recursive(isRecursive.isSelected())
-                    .regex(isRegex.isSelected())
-                    .find(searchString.getText());
-            Platform.runLater(() -> {
-                ObservableList<String> items = FXCollections.observableArrayList(matches);
-                String text="Hits: "+matches.size();
-                if (matches.size() == 0) {
-                    text="Nothing was found!";
-                }
-                totalHits.setText(text);
-                searchResults.setItems(items);
-            });*/
         } catch (Exception e) {
             e.printStackTrace();
             Platform.runLater(() -> {
                 searchProgress.close(actionEvent);
-                showError(e.getMessage(), stage);
+                showError(e.getMessage());
             });
             return;
         }
@@ -118,30 +115,26 @@ public class ClassFinderController {
         };
     }
 
-    private final Object lock = new Object();
-
     private MatchListener getMatchListener() {
         return jarFile -> Platform.runLater(() -> {
             try {
-                //synchronized (lock) {
-                    if (!searchResults.getItems().contains(jarFile.getName())) {
-                        searchResults.getItems().add(jarFile.getName());
-                        final int resultSize = searchResults.getItems().size();
-                        String text = "Hits: " + resultSize;
-                        if (resultSize == 0) {
-                            text = "Nothing was found!";
-                        }
-                        totalHits.setText(text);
+                if (!searchResults.getItems().contains(jarFile.getName())) {
+                    searchResults.getItems().add(jarFile.getName());
+                    final int resultSize = searchResults.getItems().size();
+                    String text = "Hits: " + resultSize;
+                    if (resultSize == 0) {
+                        text = "Nothing was found!";
                     }
-                //}
+                    totalHits.setText(text);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                showError(e.getMessage(), stage);
+                showError(e.getMessage());
             }
         });
     }
 
-    public void chooseSearchLocation(final ActionEvent e) {
+    public void chooseSearchLocation() {
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select directory to search");
         String initialLocation = searchLocation.getText();
@@ -153,7 +146,7 @@ public class ClassFinderController {
             searchLocation.setText(file.getAbsolutePath());
     }
 
-    public Properties getLastUsedProperties() {
+    private Properties getLastUsedProperties() {
         final Properties p = new Properties();
         try {
             try (final FileInputStream fis = new FileInputStream(LAST_USED_FILE)) {
