@@ -18,3 +18,5 @@ hs_err_pid*
 *.ipr
 *.iws
 *.iml
+find-class-fx
+target
